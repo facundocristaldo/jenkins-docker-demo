@@ -51,7 +51,7 @@ node {
   }
   stage('Docker execution') {
     steps {
-      sh "echo 'a change'"
+      sh "echo 'a change 1'"
       sh "CONTAINER_ID= $(docker run facundocristaldo/docker-nodejs:${commit_id}))"
     }
   }
