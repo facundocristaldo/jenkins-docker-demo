@@ -29,14 +29,13 @@ node {
           def myTestContainer = docker.image('node:4.6')
           myTestContainer.pull()
           withDockerNetwork{ n ->
-              mysql.run("--network ${n} --name mysql")
-              myTestContainer.inside("--network ${n} --name node") { // using linking, mysql will be available at host: mysql, port: 3306
-                    sh 'npm install --only=dev' 
-                    sh 'npm test'                     
-              }             
+              mysql.withRun("--network ${n} --name mysql"){ c ->
+                myTestContainer.inside("--network ${n} --name node") { // using linking, mysql will be available at host: mysql, port: 3306
+                      sh 'npm install --only=dev' 
+                      sh 'npm test'                     
+                }             
+              }
           }
-          mysql.stop()
-          myTestContainer.stop()
         }
       }
    }                                     
