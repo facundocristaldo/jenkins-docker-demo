@@ -49,6 +49,10 @@ node {
   }
   stage('Docker execution') {
       sh "echo 'a change 1'"
-      sh "docker run -d -n docker-nodejs facundocristaldo/docker-nodejs:${commit_id})"
+      sh "ls -l ."
+      sh "docker build -t docker-nodejs-test ."
+      sh "echo 'a change 2'"
+      sh "docker run -d --name docker-nodejs docker-nodejs-test"
+      sh "echo 'a change 3'"
   }
 }               
