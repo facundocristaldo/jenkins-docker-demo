@@ -20,39 +20,35 @@ node {
     sh "git rev-parse --short HEAD > .git/commit-id"
     commit_id = readFile('.git/commit-id').trim()
   }
-  // stage('test') {
-  //   def myTestContainer = docker.image('node:4.6')
-  //   myTestContainer.pull()
-  //   myTestContainer.inside {
-  //     sh 'npm install --only=dev'
-  //     sh 'npm test'
-  //   }
-  // }
-  // stage('test with a DB') {
-  //   def mysql = docker.image('mysql')
-  //   mysql.pull()
-  //   def myTestContainer = docker.image('node:4.6')
-  //   myTestContainer.pull()
-  //   withDockerNetwork{ n ->
-  //       mysql.withRun("--network ${n} --name mysql"){ c ->
-  //         myTestContainer.inside("--network ${n} --name node") { // using linking, mysql will be available at host: mysql, port: 3306
-  //               sh 'npm install --only=dev' 
-  //               sh 'npm test'                     
-  //         }             
-  //       }
-  //   }
-  // }
+  stage('test') {
+    def myTestContainer = docker.image('node:4.6')
+    myTestContainer.pull()
+    myTestContainer.inside {
+      sh 'npm install --only=dev'
+      sh 'npm test'
+    }
+  }
+  stage('test with a DB') {
+    def mysql = docker.image('mysql')
+    mysql.pull()
+    def myTestContainer = docker.image('node:4.6')
+    myTestContainer.pull()
+    withDockerNetwork{ n ->
+        mysql.withRun("--network ${n} --name mysql"){ c ->
+          myTestContainer.inside("--network ${n} --name node") { // using linking, mysql will be available at host: mysql, port: 3306
+                sh 'npm install --only=dev' 
+                sh 'npm test'                     
+          }             
+        }
+    }
+  }
   // stage('docker build/push') {            
   //   docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
   //     def app = docker.build("facundocristaldo/docker-nodejs:${commit_id}", '.').push()
   //   }        
   // }
   stage('Docker execution') {
-      sh "echo 'a change 1'"
-      sh "ls -l ."
       sh "docker build -t docker-nodejs-test ."
-      sh "echo 'a change 2'"
       sh "docker run -d --name docker-nodejs docker-nodejs-test"
-      sh "echo 'a change 3'"
   }
 }               
