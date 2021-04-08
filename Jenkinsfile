@@ -48,7 +48,8 @@ node {
   //   }        
   // }
   stage('Docker execution') {
-      sh "docker build -t docker-nodejs-test ."
-      sh "docker run -p 3000:3000 -d --name docker-nodejs docker-nodejs-test"
+    sh "docker build -t docker-nodejs-test ."
+    sh "docker stop docker-nodejs || true && docker rm docker-nodejs || true"
+    sh "docker run -p 3000:3000 -d --name docker-nodejs docker-nodejs-test"
   }
 }               
