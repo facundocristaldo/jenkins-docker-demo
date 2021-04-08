@@ -22,7 +22,7 @@ node {
    stage('test with a DB') {
      def mysql = docker.image('mysql')
      mysql.pull()
-     mysql.run("--force-recreate")
+     mysql.run()
      echo "mysql.id ${mysql.id}"
      def myTestContainer = docker.image('node:4.6')
      myTestContainer.pull()
