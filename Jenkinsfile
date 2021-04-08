@@ -41,10 +41,12 @@ node {
           }             
         }
     }
-  }                                     
-  stage('docker build/push') {            
+  }
+  stage('docker build/push/run') {            
     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
       def app = docker.build("facundocristaldo/docker-nodejs:${commit_id}", '.').push()
-    }                                     
+    }
+    sh "CONTAINER_ID= $(docker run facundocristaldo/docker-nodejs:${commit_id})"
+    sh "docker exec -ti $CONTAINER_ID nodedocker"         
   }     
-}                                          
+}               
