@@ -2,4 +2,4 @@
 
 ## Testing out CI/CD
 
-This is fun
+This is fun!
