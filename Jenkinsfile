@@ -48,5 +48,10 @@ node {
     }
     sh "CONTAINER_ID= $(docker run facundocristaldo/docker-nodejs:${commit_id})"
     sh "docker exec -ti $CONTAINER_ID nodedocker"         
-  }     
+  }
+  stage('Docker execution') {
+    steps {                     
+            sh "CONTAINER_ID= $(docker run facundocristaldo/docker-nodejs:${commit_id}))"
+        }
+  }
 }               
