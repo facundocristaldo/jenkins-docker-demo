@@ -24,6 +24,7 @@ node {
      mysql.pull()
      mysql.run()
      echo "mysql.id ${mysql.id}"
+     docker ps -a
      def myTestContainer = docker.image('node:4.6')
      myTestContainer.pull()
      myTestContainer.inside("--link ${mysql.id}:mysql") { // using linking, mysql will be available at host: mysql, port: 3306
