@@ -1,11 +1,12 @@
 node {
-   def commit_id
-   environment {
-        MYSQL_HOST = 'mysql'
-        MYSQL_USER = 'root'
-        MYSQL_DATABASE = "dbtest"
-        MYSQL_ALLOW_EMPTY_PASSWORD = yes
-    }
+  def commit_id
+  environment {
+      MYSQL_HOST = 'mysql'
+      MYSQL_USER = 'root'
+      MYSQL_DATABASE = "dbtest"
+      MYSQL_ALLOW_EMPTY_PASSWORD = yes
+  }
+  stages {
    stage('Preparation') {
      checkout scm
      sh "git rev-parse --short HEAD > .git/commit-id"
@@ -20,23 +21,29 @@ node {
      }
    }
    stage('test with a DB') {
-      def mysql = docker.image('mysql')
-      mysql.pull()
-      def myTestContainer = docker.image('node:4.6')
-      myTestContainer.pull()
-      withDockerNetwork{ n ->
-          mysql.run("--network ${n} --name mysql")
-          myTestContainer.inside("--network ${n} --name node") { // using linking, mysql will be available at host: mysql, port: 3306
-                sh 'npm install --only=dev' 
-                sh 'npm test'                     
-          }             
+      agent any
+      step{
+        script{
+          def mysql = docker.image('mysql')
+          mysql.pull()
+          def myTestContainer = docker.image('node:4.6')
+          myTestContainer.pull()
+          withDockerNetwork{ n ->
+              mysql.run("--network ${n} --name mysql")
+              myTestContainer.inside("--network ${n} --name node") { // using linking, mysql will be available at host: mysql, port: 3306
+                    sh 'npm install --only=dev' 
+                    sh 'npm test'                     
+              }             
+          }
+          mysql.stop()
+          myTestContainer.stop()
+        }
       }
-      mysql.stop()
-      myTestContainer.stop()
    }                                     
    stage('docker build/push') {            
      docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
        def app = docker.build("facundocristaldo/docker-nodejs:${commit_id}", '.').push()
      }                                     
-   }                                       
+   }     
+  }                                  
 }                                          
