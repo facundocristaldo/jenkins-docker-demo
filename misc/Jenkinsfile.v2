@@ -1,5 +1,11 @@
 node {
    def commit_id
+   environment {
+        MYSQL_HOST = 'mysql'
+        MYSQL_USER = 'root'
+        MYSQL_DATABASE = "dbtest"
+        MYSQL_ALLOW_EMPTY_PASSWORD = yes
+    }
    stage('Preparation') {
      checkout scm
      sh "git rev-parse --short HEAD > .git/commit-id"
@@ -14,7 +20,7 @@ node {
      }
    }
    stage('test with a DB') {
-     def mysql = docker.image('mysql').run("-e MYSQL_ALLOW_EMPTY_PASSWORD=yes -e MYSQL_HOST=mysql -e MYSQL_USER=root -e MYSQL_DATABASE=dbtest") 
+     def mysql = docker.image('mysql').run() 
      def myTestContainer = docker.image('node:4.6')
      myTestContainer.pull()
      myTestContainer.inside("--link ${mysql.id}:mysql") { // using linking, mysql will be available at host: mysql, port: 3306
